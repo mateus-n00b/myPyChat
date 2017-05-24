@@ -37,25 +37,33 @@ def connHandler(conn):
         data = conn.recv(1024)
         for obj in CLIENTs:
             if obj != conn:
-                obj.send(data)
+                # Tento enviar as msgs caso contrario removo a 'conn'
+                try:
+                    obj.send(data)
+                except:
+                    CLIENTs.remove(obj)
 
     sock.close()
 
 # Lado servidor (Trata as conexoes que chegam)
 # Server side (handle incoming connections)
 def serverSide():
-    try:
-        sock.bind(("",PORT))
-        sock.listen(5)
-        while True:
-            conn, addr = sock.accept()
-            if conn not in CLIENTs:
-                CLIENTs.append(conn)
-                t = Thread(None,connHandler,None,args=(conn,))
-                t.start()
-    except Exception as err:
-        print err
-        sys.exit(-1)
+    global sock
+    sock.bind(("",PORT))
+    sock.listen(5)
+    while True:
+            try:
+                # Accept the incoming connections
+                conn, addr = sock.accept()
+
+                if conn not in CLIENTs:
+                    CLIENTs.append(conn)
+                    t = Thread(None,connHandler,None,args=(conn,))
+                    t.start()
+
+            except Exception as err:
+                print err
+                sys.exit(-1)
 
 # Cliente handler (lida com as msgs que chegam)
 def clientRecv(sock):
@@ -79,7 +87,7 @@ def clientSide():
     # Lembre-se de colocar essa ',' em args
     t = Thread(None,clientRecv,None,args=(sock,))
     t.start()
-    while True:
+    while msg != "quit":
         msg = raw_input("> ")
         # Envia a mensagem com seu nome
         sock.send(NAME+"+=+"+msg)
@@ -89,20 +97,24 @@ def clientSide():
 
 # NOTE: Melhorar a mensagem de help
 if len(sys.argv) < 2:
-    print "Usage: %s -t <serverIP> or -s (play as a server)" % sys.argv[0]
+    print "Usage: %s -t <serverSERVER> or -s (play as a server)" % sys.argv[0]
     sys.exit(-1)
 
+
+# Pega os argumentos passados para o programa e os trata
 opts,args =  getopt.getopt(sys.argv[1:],"hst:",["target,help"])
 for o,a in opts:
     if o in ("-h","--help"):
-        print "Usage: %s -t <serverIP> or -s (play as a server)" % sys.argv[0]
+        print "Usage: %s -t <serverSERVER> or -s (play as a server)" % sys.argv[0]
         sys.exit(0)
     elif o in ("-s", "--server"):
         # t = Thread(None,serverSide,None)
         # t.start()
+        # Inicia o servidor
         serverSide()
     elif o in ("-t","--target"):
-        IP = a
+        SERVER = a
+        # Inicia o cliente
         clientSide()
     else:
         print "Invalid option! Try -h."
