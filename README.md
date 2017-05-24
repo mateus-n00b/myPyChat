@@ -1,6 +1,6 @@
 # myPyChat
 **Este script e um simples programa de chat cliente-servidor-client, onde o servidor apenas envia a mensagem 
-em modo "broadcast" para todos na sala.
+em modo "broadcast" para todos na sala.**
 
 * TODOs:
   * Melhorar as mensagens de help;
