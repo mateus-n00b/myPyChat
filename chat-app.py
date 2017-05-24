@@ -15,19 +15,23 @@ import getopt
 import sys
 
 # Cria o socket
+# Create the socket
 sock = socket(AF_INET,SOCK_STREAM)
 # Opcao para o reuso de portas
+# Set to reuse the ports
 sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 
 # Server address
 SERVER  = ""
 # User name
 NAME    = ""
-# Port defaul
+# Defaul port
 PORT   = 2222
 # Armazena as 'conns' para iterar e enviar as msgs
+# Keep the 'conns' to iterate trough them.
 CLIENTs = []
 
+# The connection handler
 def connHandler(conn):
     while True:
         data = conn.recv(1024)
@@ -38,6 +42,7 @@ def connHandler(conn):
     sock.close()
 
 # Lado servidor (Trata as conexoes que chegam)
+# Server side (handle incoming connections)
 def serverSide():
     try:
         sock.bind(("",PORT))
